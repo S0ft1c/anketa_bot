@@ -104,3 +104,10 @@ class DB:
             await self.conn.commit()
         except Exception as e:
             logger.error(f'Error in update_long_days_in_order_by_id -> {e}')
+
+    async def delete_order_by_id(self, order_id: int | str):
+        try:
+            cursor = await self.conn.execute('DELETE FROM orders WHERE id=?', (int(order_id),))
+            await self.conn.commit()
+        except Exception as e:
+            logger.error(f'Error in delete_order_by_id -> {e}')
