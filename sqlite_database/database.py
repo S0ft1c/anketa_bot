@@ -97,3 +97,10 @@ class DB:
             return orders
         except Exception as e:
             logger.error(f'Error in select_order_by_id -> {e}')
+
+    async def update_long_days_in_order_by_id(self, order_id: int | str, days: int):
+        try:
+            cursor = await self.conn.execute('UPDATE orders SET long_days = ? WHERE id=?', (days, order_id,))
+            await self.conn.commit()
+        except Exception as e:
+            logger.error(f'Error in update_long_days_in_order_by_id -> {e}')
