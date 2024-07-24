@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
 from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
 from datetime import datetime
 
 from loguru import logger
@@ -16,12 +17,16 @@ async def create_kb(orders: dict):
             InlineKeyboardButton(text=f'{el['date']} - {el['address']}',
                                  callback_data=f'view_order_by_id={el['id']}')
         )
+    builder.add(
+        InlineKeyboardButton(text='🔙 Назад', callback_data='ya_zakazchik')
+    )
     return builder.adjust(1).as_markup()
 
 
 @list_my_orders_router.callback_query(F.data.contains('view_my_orders'))
-async def view_my_orders_handler(callback: CallbackQuery):
+async def view_my_orders_handler(callback: CallbackQuery, state: FSMContext):
     try:
+        await state.clear()
         async with DB() as db:
             orders = await db.select_orders_where_customer(callback.from_user.id)
 

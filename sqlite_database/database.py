@@ -73,7 +73,7 @@ class DB:
         except Exception as e:
             logger.error(f'Error in sqlite_database: add_order_to_database -> {e}')
 
-    async def select_orders_where_customer(self, customer_id: int | str):
+    async def select_orders_where_customer(self, customer_id: int | str) -> list[dict]:
         try:
             cursor = await self.conn.execute('SELECT * from orders WHERE customer_id = ?', (str(customer_id),))
             orders_from_database = await cursor.fetchall()
@@ -85,3 +85,15 @@ class DB:
             return orders
         except Exception as e:
             logger.error(f'Error in select_orders_where_customer -> {e}')
+
+    async def select_order_by_id(self, order_id: int | str) -> dict:
+        try:
+            cursor = await self.conn.execute('SELECT * from orders WHERE id=?', (int(order_id),))
+            order_from_database = await cursor.fetchone()
+            orders = {
+                el: order_from_database[idx]
+                for idx, el in enumerate(self.orders_mask)
+            }
+            return orders
+        except Exception as e:
+            logger.error(f'Error in select_order_by_id -> {e}')
