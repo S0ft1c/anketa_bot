@@ -5,7 +5,7 @@ from loguru import logger
 async def add_order_to_db(tg_id: str, data: dict):
     try:
         async with DB() as db:
-            await db.insert_order(
+            lastrowid = await db.insert_order(
                 customer_id=tg_id,
                 date=data['date'],
                 how_many_ppl=data['how_many_ppl'],
@@ -20,6 +20,6 @@ async def add_order_to_db(tg_id: str, data: dict):
                 long_time=data['long_time'],
                 long_days=data.get('long_days', 0)
             )
-
+        return lastrowid
     except Exception as e:
         logger.error(f'Error in add_order_to_db -> {e}')

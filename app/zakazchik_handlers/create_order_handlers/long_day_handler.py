@@ -1,10 +1,15 @@
+from datetime import datetime, timedelta
+
 from aiogram import Router
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from .create_order_states import CreateOrderStates
+from aiogram.types import Message
+from apscheduler.triggers.date import DateTrigger
 from loguru import logger
+
+from schedulers import scheduler, send_order_to_workers
 from utils import validate_long_days
 from .add_order_to_db import add_order_to_db
+from .create_order_states import CreateOrderStates
 
 long_day_router = Router()
 
@@ -26,10 +31,17 @@ async def yes_long_time(message: Message, state: FSMContext):
                 parse_mode='HTML',
             )
 
-            await add_order_to_db(
+            lastrowid = await add_order_to_db(
                 str(message.from_user.id),
                 await state.get_data()
             )
             await state.clear()
+
+            run_date = datetime.now() + timedelta(minutes=1)
+            scheduler.add_job(
+                func=send_order_to_workers,
+                kwargs={'bot': message.bot, 'order_id': lastrowid},
+                trigger=DateTrigger(run_date=run_date),
+            )
     except Exception as e:
         logger.error(f'Error in yes_long_time -> {e}')

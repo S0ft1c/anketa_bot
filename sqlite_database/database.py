@@ -82,8 +82,28 @@ class DB:
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (str(telegram_id), full_name, contact_number, tg_nickname, date_of_birth, area_of_residence, 5,))
             await self.conn.commit()
+            return cursor.lastrowid
         except Exception as e:
             logger.error(f'Error in insert_worker -> {e}')
+
+    async def get_all_workers(self) -> dict:
+        try:
+            green_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating >= 4')
+            yellow_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating >= 2 AND rating <= 3')
+            red_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating = 1')
+
+            green_users = await green_cursor.fetchall()
+            yellow_users = await yellow_cursor.fetchall()
+            red_users = await red_cursor.fetchall()
+
+            users = {
+                'green': green_users,
+                'yellow': yellow_users,
+                'red': red_users
+            }
+            return users
+        except Exception as e:
+            logger.error(f'Error in get_all_workers -> {e}')
 
     async def insert_order(
             self,
