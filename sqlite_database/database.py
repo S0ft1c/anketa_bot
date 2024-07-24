@@ -8,6 +8,8 @@ class DB:
         self.orders_mask = ['id', 'customer_id', 'date', 'how_many_ppl', 'address', 'work_desc',
                             'payment', 'help_phone', 'FULL_address', 'FULL_work_desc', 'FULL_phones',
                             'FULL_additional_info', 'long_time', 'long_days']
+        self.workers_mask = ['id', 'telegram_id', 'full_name', 'contact_number', 'tg_nickname', 'date_of_birth',
+                             'area_of_residence', 'rating']
 
     async def __aenter__(self):
         self.conn = await aiosqlite.connect(self.db_path)
@@ -38,6 +40,50 @@ class DB:
             )
         ''')
         await self.conn.commit()
+        await self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS workers (
+                id INTEGER PRIMARY KEY,
+                telegram_id STRING,
+                full_name TEXT,
+                contact_number TEXT,
+                tg_nickname TEXT,
+                date_of_birth TEXT,
+                area_of_residence TEXT,
+                rating INTEGER
+            )
+        ''')
+        await self.conn.commit()
+
+    async def get_worker_by_tg_id(self, tg_id: int | str):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM workers WHERE telegram_id=?', (str(tg_id),))
+            worker_from_database = await cursor.fetchone()
+            worker = {
+                el: worker_from_database[idx]
+                for idx, el in self.workers_mask
+            }
+            return worker
+        except Exception as e:
+            logger.error(f'Error in get_worker_by_tg_id -> {e}')
+
+    async def insert_worker(
+            self,
+            telegram_id: int | str,
+            full_name: str,
+            contact_number: str,
+            tg_nickname: str,
+            date_of_birth: str,
+            area_of_residence: str
+    ):
+        try:
+            cursor = await self.conn.execute('''
+            INSERT INTO workers (
+                telegram_id, full_name, contact_number, tg_nickname, date_of_birth, area_of_residence, rating
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (str(telegram_id), full_name, contact_number, tg_nickname, date_of_birth, area_of_residence, 5,))
+            await self.conn.commit()
+        except Exception as e:
+            logger.error(f'Error in insert_worker -> {e}')
 
     async def insert_order(
             self,
