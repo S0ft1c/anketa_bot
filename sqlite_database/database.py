@@ -65,6 +65,41 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def update_start_date_inwork(self, worker_id: int | str, order_id: str | int, start_time: str):
+        try:
+            cursor = await self.conn.execute('UPDATE inwork SET start_date = ? WHERE worker_id = ? AND order_id=?',
+                                             (start_time, str(worker_id), str(order_id),))
+            await self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            logger.error(f'Error in update_start_date_inwork: {e}')
+
+    async def update_end_date_inwork(self, worker_id: int | str, order_id: str | int, end_time: str):
+        try:
+            cursor = await self.conn.execute('UPDATE inwork SET end_date = ? WHERE worker_id = ? AND order_id=?',
+                                             (end_time, str(worker_id), str(order_id),))
+            await self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            logger.error(f'Error in update_end_date_inwork: {e}')
+
+    async def select_inwork_by_worker_n_order_id(self, worker_id: str | int, order_id: str | int):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM inwork WHERE worker_id = ? AND order_id = ?',
+                                             (str(worker_id), str(order_id),))
+            inwork_from_database = await cursor.fetchone()
+            if not inwork_from_database:
+                return False
+
+            result = {
+                el: inwork_from_database[idx]
+                for idx, el in enumerate(self.inwork_mask)
+            }
+            return result
+
+        except Exception as e:
+            logger.error(f'Error in select_inwork_by_worker_n_order_id: {e}')
+
     async def select_all_inwork_by_worker_id(self, worker_id: str | int):
         try:
             cursor = await self.conn.execute('SELECT * FROM inwork WHERE worker_id = ?', (str(worker_id),))

@@ -15,6 +15,14 @@ async def join_to_order_request_handler(callback: CallbackQuery, state: FSMConte
         await callback.answer('')
         order_id = callback.data.split('=')[-1]
         async with DB() as db:
+
+            possible_inwork = await db.select_inwork_by_worker_n_order_id(callback.from_user.id, order_id)
+            if possible_inwork:
+                await callback.message.answer(
+                    text='Вы уже согласились на этот заказ!',
+                )
+                return
+
             order_info = await db.select_order_by_id(order_id)
             needed_ppl_in_order = order_info['how_many_ppl']
             candidates = await db.select_all_inwork_by_order_id(order_id)

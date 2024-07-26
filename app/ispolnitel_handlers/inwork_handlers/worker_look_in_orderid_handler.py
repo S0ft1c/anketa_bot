@@ -8,6 +8,24 @@ from sqlite_database import DB
 worker_look_in_orderid_router = Router()
 
 
+async def create_kb(worker_id: str | int, order_id: str | int) -> InlineKeyboardMarkup | None:
+    async with DB() as db:
+        inwork = await db.select_inwork_by_worker_n_order_id(worker_id, order_id)
+
+        if inwork['start_date'] is None and inwork['end_date'] is None:
+            return InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Я приступаю к работе',
+                                      callback_data=f'start_work_on_order={order_id}')],
+            ])
+        elif inwork['start_date'] is not None and inwork['end_date'] is None:
+            return InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Я завершил работу',
+                                      callback_data=f'end_work_on_order={order_id}')],
+            ])
+        else:
+            return None
+
+
 @worker_look_in_orderid_router.callback_query(F.data.contains('worker_look_in_orderid'))
 async def worker_look_in_orderid_handler(callback: CallbackQuery, state: FSMContext):
     try:
@@ -32,10 +50,7 @@ async def worker_look_in_orderid_handler(callback: CallbackQuery, state: FSMCont
                      f'{f'<u>Это долгосрочный заказ. => Сроки {order_info['long_days']} дн.</u>' if order_info['long_time']
                      else f'Это не долгосрочный заказ.'}',
                 parse_mode='HTML',
-                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text='Я приступаю к работе',
-                                          callback_data=f'start_work_on_order={order_id}')],
-                ]),
+                reply_markup=await create_kb(callback.from_user.id, order_id),
             )
 
     except Exception as e:
