@@ -11,6 +11,9 @@ class DB:
         self.workers_mask = ['id', 'telegram_id', 'full_name', 'contact_number', 'tg_nickname', 'date_of_birth',
                              'area_of_residence', 'rating']
         self.inwork_mask = ['id', 'worker_id', 'order_id', 'start_date', 'end_date']
+        self.admin_reviews_mask = ['id', 'customer_id', 'worker_id', 'date', 'how_many_ppl', 'address', 'work_desc',
+                                   'payment', 'help_phone', 'FULL_address', 'FULL_work_desc', 'FULL_phones',
+                                   'FULL_additional_info', 'long_time', 'long_days', 'report', 'start_date', 'end_date']
 
     async def __aenter__(self):
         self.conn = await aiosqlite.connect(self.db_path)
@@ -64,6 +67,84 @@ class DB:
         )
         ''')
         await self.conn.commit()
+        await self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS admin_reviews (
+                id INTEGER PRIMARY KEY,
+                customer_id STRING,
+                worker_id STRING,
+                date TEXT,
+                how_many_ppl INTEGER,
+                address TEXT,
+                work_desc TEXT,
+                payment REAL,
+                help_phone TEXT,
+                FULL_address TEXT,
+                FULL_work_desc TEXT,
+                FULL_phones TEXT,
+                FULL_additional_info TEXT,
+                long_time BOOLEAN,
+                long_days INTEGER,
+                report TEXT,
+                start_date TEXT,
+                end_date TEXT
+            )
+        ''')
+        await self.conn.commit()
+
+    async def insert_admin_review(
+            self,
+            customer_id: str,
+            worker_id: str,
+            date: str,
+            how_many_ppl: int,
+            address: str,
+            work_desc: str,
+            payment: int,
+            help_phone: str,
+            full_address: str,
+            full_work_desc: str,
+            full_phones: str,
+            full_additional_info: str,
+            long_time: bool = False,
+            long_days: int = 0,
+            report: str = None,
+            start_date: str = None,
+            end_date: str = None
+    ):
+        try:
+            cursor = await self.conn.execute('''
+                INSERT INTO admin_reviews (
+                    customer_id, worker_id, date, how_many_ppl, address,
+                    work_desc, payment, help_phone,
+                    full_address, full_work_desc, full_phones, full_additional_info,
+                    long_time, long_days, report, start_date, end_date
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            ''', (
+                customer_id, worker_id, date, how_many_ppl, address,
+                work_desc, payment, help_phone,
+                full_address, full_work_desc, full_phones, full_additional_info,
+                long_time, long_days, report, start_date, end_date
+            ))
+            await self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            logger.error(f'Error in insert_admin_review: {e}')
+
+    async def delete_inwork_by_order_id(self, order_id: str | int):
+        try:
+            cursor = await self.conn.execute('DELETE FROM inwork WHERE order_id=?', (order_id,))
+            await self.conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f'Error in delete_inwork_by_order_id: {e}')
+
+    async def delete_order_by_order_id(self, order_id: str | int):
+        try:
+            cursor = await self.conn.execute('DELETE FROM orders WHERE id=?', (order_id,))
+            await self.conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f'Error in delete_order_by_order_id: {e}')
 
     async def update_start_date_inwork(self, worker_id: int | str, order_id: str | int, start_time: str):
         try:
@@ -99,6 +180,22 @@ class DB:
 
         except Exception as e:
             logger.error(f'Error in select_inwork_by_worker_n_order_id: {e}')
+
+    async def select_all_inwork_by_order_id(self, order_id: int | str):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM inwork WHERE order_id = ?',
+                                             (str(order_id),))
+            inworks_from_db = await cursor.fetchall()
+            result = [
+                {
+                    el: inwork[idx]
+                    for idx, el in enumerate(self.inwork_mask)
+                }
+                for inwork in inworks_from_db
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_inwork_by_order_id : {e}')
 
     async def select_all_inwork_by_worker_id(self, worker_id: str | int):
         try:

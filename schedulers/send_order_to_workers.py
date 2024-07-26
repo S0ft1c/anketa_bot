@@ -39,12 +39,14 @@ async def send_order_to_workers(bot: Bot, order_id: int | str):
         # green workers first
         for worker in workers['green']:
             await send_message_to_worker(bot, order, worker)
+            await asyncio.sleep(5)
 
         await asyncio.sleep(10 * 60)  # wait for 10 minutes
 
         # yellow workers second
         for worker in workers['yellow']:
             await send_message_to_worker(bot, order, worker)
+            await asyncio.sleep(5)
 
         await asyncio.sleep(15 * 60)  # wait for 15 minutes
 
@@ -52,6 +54,7 @@ async def send_order_to_workers(bot: Bot, order_id: int | str):
         # TODO: send to the group
         for worker in workers['red']:
             await send_message_to_worker(bot, order, worker)
+            await asyncio.sleep(5)
 
         logger.info(f'All workers got messages')
     except Exception as e:
