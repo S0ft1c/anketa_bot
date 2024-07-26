@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from loguru import logger
 
 from app.ispolnitel_handlers.registrate_worker.registrate_worker_states import RegistrateWorkerStates
@@ -30,6 +30,9 @@ async def ya_ispolnitel_menu(callback: CallbackQuery, state: FSMContext):
                 text=f'<b>Вы зашли как исполнитель</b>\n'
                      f'Выберите интересующее вас действие.',
                 parse_mode='HTML',
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text='Активные заказы', callback_data='active_work')],
+                ])
             )
 
     except Exception as e:

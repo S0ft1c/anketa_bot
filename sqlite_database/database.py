@@ -10,6 +10,7 @@ class DB:
                             'FULL_additional_info', 'long_time', 'long_days']
         self.workers_mask = ['id', 'telegram_id', 'full_name', 'contact_number', 'tg_nickname', 'date_of_birth',
                              'area_of_residence', 'rating']
+        self.inwork_mask = ['id', 'worker_id', 'order_id', 'start_date', 'end_date']
 
     async def __aenter__(self):
         self.conn = await aiosqlite.connect(self.db_path)
@@ -53,6 +54,47 @@ class DB:
             )
         ''')
         await self.conn.commit()
+        await self.conn.execute('''
+        CREATE TABLE IF NOT EXISTS inwork (
+            id INTEGER PRIMARY KEY,
+            worker_id STRING,
+            order_id STRING, 
+            start_date TEXT,
+            end_date TEXT
+        )
+        ''')
+        await self.conn.commit()
+
+    async def select_all_inwork_by_worker_id(self, worker_id: str | int):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM inwork WHERE worker_id = ?', (str(worker_id),))
+            result = [
+                {
+                    el: inwork[idx]
+                    for idx, el in enumerate(self.inwork_mask)
+                }
+                for inwork in await cursor.fetchall()
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_inwork_by_worker_id: {e}')
+
+    async def insert_inwork(self, worker_id: int | str, order_id: int | str):
+        try:
+            cursor = await self.conn.execute('INSERT INTO inwork (worker_id, order_id) VALUES (?, ?)',
+                                             (str(worker_id), str(order_id),))
+            await self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            logger.error(f'Error in insert_inwork: {e}')
+
+    async def select_all_inwork_by_order_id(self, order_id: int | str):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM inwork WHERE order_id = ?', (str(order_id),))
+            rows = await cursor.fetchall()
+            return rows
+        except Exception as e:
+            logger.error(f'Error in select_all_inworks_by_order_id: {e}')
 
     async def get_worker_by_tg_id(self, tg_id: int | str):
         try:
@@ -60,7 +102,7 @@ class DB:
             worker_from_database = await cursor.fetchone()
             worker = {
                 el: worker_from_database[idx]
-                for idx, el in self.workers_mask
+                for idx, el in enumerate(self.workers_mask)
             }
             return worker
         except Exception as e:
