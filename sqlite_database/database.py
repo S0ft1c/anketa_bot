@@ -91,6 +91,21 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def select_all_admin_reviews(self):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM admin_reviews')
+            admin_reviews_from_database = await cursor.fetchall()
+            result = [
+                {
+                    el: rev[idx]
+                    for idx, el in enumerate(self.admin_reviews_mask)
+                }
+                for rev in admin_reviews_from_database
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_admin_reviews: {e}')
+
     async def insert_admin_review(
             self,
             customer_id: str,
