@@ -62,6 +62,7 @@ async def report_end_order_handler(message: Message, state: FSMContext):
         await message.answer(
             text='Отчет успешно отправлен! Спасибо!'
         )
+        await state.clear()
 
     except Exception as e:
         logger.error(f'Error in report_end_order_handler: {e}')

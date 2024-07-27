@@ -12,7 +12,6 @@ admin_command_router = Router()
 
 load_dotenv()
 admin_ids = set(int(el) for el in os.environ.get('ADMIN_IDS').split(','))
-print(admin_ids)
 
 
 @admin_command_router.message(Command('admin'), F.from_user.id.in_(admin_ids))

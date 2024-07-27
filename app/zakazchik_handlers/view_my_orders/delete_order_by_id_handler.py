@@ -15,7 +15,7 @@ async def delete_order_by_id_handler(callback: CallbackQuery, state: FSMContext)
 
         order_id = callback.data.split('=')[-1]
         async with DB() as db:
-            await db.delete_order_by_id(order_id)
+            await db.delete_order_by_order_id(order_id)
 
         await callback.answer('')
         await callback.message.answer(

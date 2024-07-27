@@ -14,6 +14,9 @@ class DB:
         self.admin_reviews_mask = ['id', 'customer_id', 'worker_id', 'date', 'how_many_ppl', 'address', 'work_desc',
                                    'payment', 'help_phone', 'FULL_address', 'FULL_work_desc', 'FULL_phones',
                                    'FULL_additional_info', 'long_time', 'long_days', 'report', 'start_date', 'end_date']
+        self.admin_logs_mask = ['id', 'customer_id', 'worker_id', 'date', 'how_many_ppl', 'address', 'work_desc',
+                                'payment', 'help_phone', 'FULL_address', 'FULL_work_desc', 'FULL_phones',
+                                'FULL_additional_info', 'long_time', 'long_days', 'report', 'hours']
 
     async def __aenter__(self):
         self.conn = await aiosqlite.connect(self.db_path)
@@ -90,6 +93,117 @@ class DB:
             )
         ''')
         await self.conn.commit()
+        await self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS admin_logs (
+                id INTEGER PRIMARY KEY,
+                customer_id STRING,
+                worker_id STRING,
+                date TEXT,
+                how_many_ppl INTEGER,
+                address TEXT,
+                work_desc TEXT,
+                payment REAL,
+                help_phone TEXT,
+                FULL_address TEXT,
+                FULL_work_desc TEXT,
+                FULL_phones TEXT,
+                FULL_additional_info TEXT,
+                long_time BOOLEAN,
+                long_days INTEGER,
+                report TEXT,
+                hours INTEGER
+            )
+        ''')
+        await self.conn.commit()
+
+    async def decrease_worker_rating(self, worker_id: int | str):
+        try:
+            cursor = await self.conn.execute('''
+                UPDATE workers SET rating = rating - 1 WHERE telegram_id = ? AND rating > 0
+            ''', (str(worker_id),))
+            await self.conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f'Error in update_worker_rating: {e}')
+
+    async def delete_review_by_id(self, review_id: int | str):
+        try:
+            cursor = await self.conn.execute('DELETE FROM admin_reviews WHERE id=?', (review_id,))
+            await self.conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f'Error in delete_review_by_id: {e}')
+
+    async def update_worker_rating(self, worker_id: int | str):
+        try:
+            cursor = await self.conn.execute('''
+                UPDATE workers SET rating = rating + 1 WHERE telegram_id = ? AND rating < 5
+            ''', (str(worker_id),))
+            await self.conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f'Error in update_worker_rating: {e}')
+
+    async def select_admin_logs_by_worker_id(self, worker_id: int | str):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM admin_logs WHERE worker_id = ?', (str(worker_id),))
+            logs_from_db = await cursor.fetchall()
+            result = [
+                {
+                    el: log[idx]
+                    for idx, el in enumerate(self.admin_logs_mask)
+                }
+                for log in logs_from_db
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_admin_logs_by_worker_id({worker_id}): {e}')
+
+    async def insert_admin_log(
+            self,
+            customer_id: str,
+            worker_id: str,
+            date: str,
+            how_many_ppl: int,
+            address: str,
+            work_desc: str,
+            payment: int,
+            help_phone: str,
+            full_address: str,
+            full_work_desc: str,
+            full_phones: str,
+            full_additional_info: str,
+            long_time: bool = False,
+            long_days: int = 0,
+            report: str = None,
+            hours: int = 0
+    ):
+        try:
+            cursor = await self.conn.execute('''
+                INSERT INTO admin_logs (
+                    customer_id, worker_id, date, how_many_ppl, address,
+                    work_desc, payment, help_phone,
+                    full_address, full_work_desc, full_phones, full_additional_info,
+                    long_time, long_days, report, hours
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            ''', (
+                customer_id, worker_id, date, how_many_ppl, address,
+                work_desc, payment, help_phone,
+                full_address, full_work_desc, full_phones, full_additional_info,
+                long_time, long_days, report, hours
+            ))
+            await self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            logger.error(f'Error in insert_admin_log: {e}')
+
+    async def select_review_by_id(self, review_id: int | str):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM admin_reviews WHERE id=?', (int(review_id),))
+            row = await cursor.fetchone()
+            return row
+        except Exception as e:
+            logger.error(f'Error in select_review_by_id: {e}')
 
     async def select_all_admin_reviews(self):
         try:
@@ -235,14 +349,6 @@ class DB:
         except Exception as e:
             logger.error(f'Error in insert_inwork: {e}')
 
-    async def select_all_inwork_by_order_id(self, order_id: int | str):
-        try:
-            cursor = await self.conn.execute('SELECT * FROM inwork WHERE order_id = ?', (str(order_id),))
-            rows = await cursor.fetchall()
-            return rows
-        except Exception as e:
-            logger.error(f'Error in select_all_inworks_by_order_id: {e}')
-
     async def get_worker_by_tg_id(self, tg_id: int | str):
         try:
             cursor = await self.conn.execute('SELECT * FROM workers WHERE telegram_id=?', (str(tg_id),))
@@ -359,10 +465,3 @@ class DB:
             await self.conn.commit()
         except Exception as e:
             logger.error(f'Error in update_long_days_in_order_by_id -> {e}')
-
-    async def delete_order_by_id(self, order_id: int | str):
-        try:
-            cursor = await self.conn.execute('DELETE FROM orders WHERE id=?', (int(order_id),))
-            await self.conn.commit()
-        except Exception as e:
-            logger.error(f'Error in delete_order_by_id -> {e}')
