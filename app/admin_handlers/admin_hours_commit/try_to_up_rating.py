@@ -1,5 +1,7 @@
-from sqlite_database import DB
 from loguru import logger
+
+from sqlite_database import DB
+
 
 async def try_to_update_rating(rev_info: dict):
     try:
@@ -9,6 +11,8 @@ async def try_to_update_rating(rev_info: dict):
             for log in worker_logs:
                 if log['hours'] != -1:
                     podryad += 1
+                else:
+                    podryad = 0
             if podryad % 7 == 0:
                 await db.update_worker_rating(rev_info['worker_id'])
     except Exception as e:
