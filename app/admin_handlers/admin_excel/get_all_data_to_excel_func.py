@@ -60,5 +60,7 @@ async def get_all_data_to_excel(bot: Bot, chat_id: int | str, start_date: str, e
             document=FSInputFile('output.xlsx'),
         )
 
+        del table
+        del pivot_table
     except Exception as e:
         logger.error(f'Error in sending a excel file -> {e}')

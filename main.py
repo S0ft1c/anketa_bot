@@ -13,6 +13,9 @@ TOKEN = os.environ.get('TOKEN')
 
 
 async def main():
+    # configure logger
+    logger.add("bot.log", format="{time} {level} {message}", level="INFO")
+
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
 

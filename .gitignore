@@ -4,3 +4,4 @@
 *.sqlite
 test.py
 *.xlsx
+*.log

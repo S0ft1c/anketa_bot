@@ -16,6 +16,15 @@ async def join_to_order_request_handler(callback: CallbackQuery, state: FSMConte
         order_id = callback.data.split('=')[-1]
         async with DB() as db:
 
+            worker = await db.get_worker_by_tg_id(callback.from_user.id)
+            if not worker:
+                await callback.message.answer(
+                    text='Вы не зарегистрированы как исполнитель.\n'
+                         'Напишите /start после выберите, что вы исполнитель и пройдите регистрацию.\n'
+                         'После регистрации попробуйте еще раз.'
+                )
+                return
+
             possible_inwork = await db.select_inwork_by_worker_n_order_id(callback.from_user.id, order_id)
             if possible_inwork:
                 await callback.message.answer(
