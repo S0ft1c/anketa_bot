@@ -24,6 +24,7 @@ async def admin_command_handler(message: Message, state: FSMContext):
             parse_mode=ParseMode.HTML,
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Подтверждение часов', callback_data='admin_hours_commit_list')],
+                [InlineKeyboardButton(text='Долгосрочные проекты', callback_data='admin_long_projects_list')],
             ])
         )
     except Exception as e:

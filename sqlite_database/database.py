@@ -116,6 +116,21 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def select_long_projects_from_orders(self):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM orders WHERE long_time = True AND long_days = 0')
+            orders_from_database = await cursor.fetchall()
+            result = [
+                {
+                    el: order[idx]
+                    for idx, el in enumerate(self.orders_mask)
+                }
+                for order in orders_from_database
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_long_projects_from_orders: {e}')
+
     async def decrease_worker_rating(self, worker_id: int | str):
         try:
             cursor = await self.conn.execute('''
