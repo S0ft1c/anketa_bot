@@ -116,6 +116,21 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def select_all_admin_logs(self):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM admin_logs')
+            data = await cursor.fetchall()
+            result = [
+                {
+                    el: ddd[idx]
+                    for idx, el in enumerate(self.admin_logs_mask)
+                }
+                for ddd in data
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_admin_logs -> {e}')
+
     async def select_long_projects_from_orders(self):
         try:
             cursor = await self.conn.execute('SELECT * FROM orders WHERE long_time = True AND long_days = 0')

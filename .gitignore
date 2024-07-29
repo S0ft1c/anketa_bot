@@ -2,3 +2,5 @@
 .idea
 .env
 *.sqlite
+test.py
+*.xlsx
