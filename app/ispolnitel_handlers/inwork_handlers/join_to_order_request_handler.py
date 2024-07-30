@@ -33,6 +33,13 @@ async def join_to_order_request_handler(callback: CallbackQuery, state: FSMConte
                 return
 
             order_info = await db.select_order_by_id(order_id)
+
+            if str(order_info['customer_id']) == str(callback.from_user.id):
+                await callback.message.answer(
+                    text='Вы сами создали этот заказ. Вы не можете стать его исполнителем.'
+                )
+                return
+
             needed_ppl_in_order = order_info['how_many_ppl']
             candidates = await db.select_all_inwork_by_order_id(order_id)
 
