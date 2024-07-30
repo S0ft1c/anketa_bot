@@ -411,22 +411,35 @@ class DB:
         except Exception as e:
             logger.error(f'Error in insert_worker -> {e}')
 
-    async def get_all_workers(self) -> dict:
+    async def get_all_workers(self, rated: bool = True):
         try:
-            green_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating >= 4')
-            yellow_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating >= 2 AND rating <= 3')
-            red_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating = 1')
+            if rated:
+                green_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating >= 4')
+                yellow_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating >= 2 AND rating <= 3')
+                red_cursor = await self.conn.execute('SELECT * FROM workers WHERE rating = 1')
 
-            green_users = await green_cursor.fetchall()
-            yellow_users = await yellow_cursor.fetchall()
-            red_users = await red_cursor.fetchall()
+                green_users = await green_cursor.fetchall()
+                yellow_users = await yellow_cursor.fetchall()
+                red_users = await red_cursor.fetchall()
 
-            users = {
-                'green': green_users,
-                'yellow': yellow_users,
-                'red': red_users
-            }
-            return users
+                users = {
+                    'green': green_users,
+                    'yellow': yellow_users,
+                    'red': red_users
+                }
+                return users
+            else:
+                cursor = await self.conn.execute('SELECT * FROM workers')
+                workers_from_db = await cursor.fetchall()
+                result = [
+                    {
+                        el: worker[idx]
+                        for idx, el in enumerate(self.workers_mask)
+                    }
+                    for worker in workers_from_db
+                ]
+                return result
+
         except Exception as e:
             logger.error(f'Error in get_all_workers -> {e}')
 

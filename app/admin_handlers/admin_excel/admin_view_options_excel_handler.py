@@ -23,6 +23,8 @@ async def admin_view_options_excel_handler(callback: CallbackQuery, state: FSMCo
                                       callback_data='to_excel_all_orders_by_own_data')],
                 [InlineKeyboardButton(text='Выгрузить заказы по неделе',
                                       callback_data='to_excel_all_orders_by_week')],
+                [InlineKeyboardButton(text='Выгрузить информацию по исполнителям',
+                                      callback_data='to_excel_all_workers')],
             ])
         )
 
