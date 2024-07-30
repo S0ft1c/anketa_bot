@@ -15,8 +15,14 @@ async def admin_view_options_excel_handler(callback: CallbackQuery, state: FSMCo
         await callback.message.answer(
             text='Выберите, какие данные вы хотите получить',
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Выгрузить по своим датам.',
-                                      callback_data='to_excel_by_own_data')]
+                [InlineKeyboardButton(text='Выгрузить исполнителей по своим датам',
+                                      callback_data='to_excel_by_own_data')],
+                [InlineKeyboardButton(text='Выгрузить исполнителей по неделе',
+                                      callback_data='to_excel_by_week')],
+                [InlineKeyboardButton(text='Выгрузить заказы по своим датам',
+                                      callback_data='to_excel_all_orders_by_own_data')],
+                [InlineKeyboardButton(text='Выгрузить заказы по неделе',
+                                      callback_data='to_excel_all_orders_by_week')],
             ])
         )
 
