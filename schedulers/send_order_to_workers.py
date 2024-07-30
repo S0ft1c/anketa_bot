@@ -1,7 +1,9 @@
 import asyncio
+import os
 
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from dotenv import load_dotenv
 from loguru import logger
 
 from sqlite_database import DB
@@ -30,6 +32,30 @@ async def send_message_to_worker(bot: Bot, order, worker):
         logger.error(f'Error in schedulers.send_message_to_workers: {e}')
 
 
+async def send_message_to_group(bot: Bot, order):
+    try:
+        load_dotenv()
+        await bot.send_message(
+            chat_id=os.environ.get('GROUP_ID'),
+            text=f'<b>Вам доступен новый заказ!</b>\n'
+                 f'Дата: {order['date']}\n'
+                 f'Требуется людей: {order['how_many_ppl']}\n'
+                 f'Адрес: {order['address']}\n'
+                 f'Описание работы:\n{order['work_desc']}\n'
+                 f'Оплата (руб/час): {order['payment']}\n'
+                 f'Телефон для справок: {order['help_phone']}\n'
+                 f'{f'<u>Это долгосрочный заказ. => Сроки {order['long_days']} дн.</u>' if order['long_time']
+                 else f'Это не долгосрочный заказ.'}',
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Я приду!',
+                                      url=f'https://t.me/stephans_programming_test_bot?start={order["id"]}')],
+            ])
+        )
+    except Exception as e:
+        logger.error(f'Error in schedulers.send_message_to_group: {e}')
+
+
 async def send_order_to_workers(bot: Bot, order_id: int | str):
     try:
         async with DB() as db:
@@ -50,11 +76,8 @@ async def send_order_to_workers(bot: Bot, order_id: int | str):
 
         await asyncio.sleep(15 * 60)  # wait for 15 minutes
 
-        # red on the third
-        # TODO: send to the group
-        for worker in workers['red']:
-            await send_message_to_worker(bot, order, worker)
-            await asyncio.sleep(5)
+        # red on the third (to group)
+        await send_message_to_group(bot, order)
 
         logger.info(f'All workers got messages')
     except Exception as e:
