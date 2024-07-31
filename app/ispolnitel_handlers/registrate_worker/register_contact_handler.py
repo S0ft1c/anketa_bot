@@ -16,8 +16,8 @@ async def register_contact_handler(message: Message, state: FSMContext):
         await state.set_state(RegistrateWorkerStates.date_of_birth)
 
         await message.answer(
-            text=f'<b>Регистрация нового исполнителя</b>\n'
-                 f'Ваш номер телефона принят! Теперь введите свою дату рождения в формате:\n'
+            text=f'<b>Ваш номер телефона принят!</b> <i>Теперь укажите вашу дату рождения.</i>\n'
+                 f'Теперь введите свою дату рождения в формате:\n'
                  f'<pre>день.месяц.год</pre>\nНапример: 01.04.2022',
             parse_mode='HTML',
             reply_markup=ReplyKeyboardRemove(),

@@ -1,6 +1,6 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from loguru import logger
 
 from app.ispolnitel_handlers.registrate_worker.registrate_worker_states import RegistrateWorkerStates
@@ -14,8 +14,12 @@ async def registrate_area_handler(message: Message, state: FSMContext):
     try:
         await state.update_data(area_of_residence=message.text)
         await message.answer(
-            text=f'Прекрасно! Теперь вы зарегистрированы! Можете перейти в свой аккаунт.',
+            text=f'<b>Прекрасно! Теперь вы зарегистрированы!</b> Можете перейти в свой аккаунт.',
             parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='В аккаунт исполнителя',
+                                      callback_data='ya_ispolnitel')],
+            ])
         )
 
         await add_worker_to_db(

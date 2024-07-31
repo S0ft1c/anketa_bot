@@ -31,7 +31,7 @@ async def ya_ispolnitel_menu(callback: CallbackQuery, state: FSMContext):
                      f'Выберите интересующее вас действие.',
                 parse_mode='HTML',
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text='Активные заказы', callback_data='active_work')],
+                    [InlineKeyboardButton(text='👷‍♂️ Активные заказы', callback_data='active_work')],
                 ])
             )
 

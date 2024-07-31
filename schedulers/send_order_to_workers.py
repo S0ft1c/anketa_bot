@@ -11,17 +11,23 @@ from sqlite_database import DB
 
 async def send_message_to_worker(bot: Bot, order, worker):
     try:
+        if order['long_time'] and order['long_days'] > 0:
+            ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_time']}</u>\n'
+                      f'Учитывайте дату, когда создавался заказ, чтобы понять до какого он числа.')
+        elif order['long_time'] and order['long_days'] == 0:
+            ll_txt = f'<u>Это долгосрочный заказ. Его длительность не была определена заказчиком.</u>'
+        else:
+            ll_txt = f'<u>Это не долгосрочный заказ.</u>'
+
         await bot.send_message(
             chat_id=worker['telegram_id'],
             text=f'<b>Вам доступен новый заказ!</b>\n'
-                 f'Дата: {order['date']}\n'
-                 f'Требуется людей: {order['how_many_ppl']}\n'
-                 f'Адрес: {order['address']}\n'
-                 f'Описание работы:\n{order['work_desc']}\n'
-                 f'Оплата (руб/час): {order['payment']}\n'
-                 f'Телефон для справок: {order['help_phone']}\n'
-                 f'{f'<u>Это долгосрочный заказ. => Сроки {order['long_days']} дн.</u>' if order['long_time']
-                 else f'Это не долгосрочный заказ.'}',
+                 f'📅 <b>Дата заказа: {order['date']}</b>\n--------------\n'
+                 f'👥 <i>Людей надо</i>:\n{order['how_many_ppl']}\n--------------\n'
+                 f'🏠 <i>Адрес</i>:\n{order['address']}\n--------------\n'
+                 f'🔧 <i>Описание работы</i>\n{order['work_desc']}\n--------------\n'
+                 f'💵 <i>Оплата (руб/час)</i>\n{order['payment']}\n--------------\n'
+                 f'📞 <i>Телефон для справок</i>\n{order['help_phone']}\n--------------\n\n' + ll_txt,
             parse_mode='HTML',
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Я приду!',
@@ -35,17 +41,24 @@ async def send_message_to_worker(bot: Bot, order, worker):
 async def send_message_to_group(bot: Bot, order):
     try:
         load_dotenv()
+
+        if order['long_time'] and order['long_days'] > 0:
+            ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_time']}</u>\n'
+                      f'Учитывайте дату, когда создавался заказ, чтобы понять до какого он числа.')
+        elif order['long_time'] and order['long_days'] == 0:
+            ll_txt = f'<u>Это долгосрочный заказ. Его длительность не была определена заказчиком.</u>'
+        else:
+            ll_txt = f'<u>Это не долгосрочный заказ.</u>'
+
         await bot.send_message(
             chat_id=os.environ.get('GROUP_ID'),
-            text=f'<b>Вам доступен новый заказ!</b>\n'
-                 f'Дата: {order['date']}\n'
-                 f'Требуется людей: {order['how_many_ppl']}\n'
-                 f'Адрес: {order['address']}\n'
-                 f'Описание работы:\n{order['work_desc']}\n'
-                 f'Оплата (руб/час): {order['payment']}\n'
-                 f'Телефон для справок: {order['help_phone']}\n'
-                 f'{f'<u>Это долгосрочный заказ. => Сроки {order['long_days']} дн.</u>' if order['long_time']
-                 else f'Это не долгосрочный заказ.'}',
+            text=f'<b>Появился новый заказ!</b>\n'
+                 f'📅 <b>Дата заказа: {order['date']}</b>\n--------------\n'
+                 f'👥 <i>Людей надо</i>:\n{order['how_many_ppl']}\n--------------\n'
+                 f'🏠 <i>Адрес</i>:\n{order['address']}\n--------------\n'
+                 f'🔧 <i>Описание работы</i>\n{order['work_desc']}\n--------------\n'
+                 f'💵 <i>Оплата (руб/час)</i>\n{order['payment']}\n--------------\n'
+                 f'📞 <i>Телефон для справок</i>\n{order['help_phone']}\n--------------\n\n' + ll_txt,
             parse_mode='HTML',
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Я приду!',

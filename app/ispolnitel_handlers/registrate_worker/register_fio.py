@@ -15,9 +15,8 @@ async def register_fio_handler(message: Message, state: FSMContext):
         await state.set_state(RegistrateWorkerStates.contact_number)
 
         await message.answer(
-            text=f'<b>Регистрация нового исполнителя</b>\n'
-                 f'Замечательно! Внизу есть кнопка. Вам необходимо нажать ее для того чтобы мы могли получить ваш '
-                 f'номер телефона.',
+            text=f'<b>Ваше ФИО успешно добавлено!</b> <i>Теперь нам надо получить ваш номер телефона.</i>\n'
+                 f'Внизу есть кнопка. Нажмите ее и поделитесь своим номером телефона.',
             parse_mode='HTML',
             reply_markup=ReplyKeyboardMarkup(keyboard=[
                 [KeyboardButton(text='Поделиться контактами', request_contact=True)]

@@ -15,16 +15,16 @@ async def register_date_of_birth_handler(message: Message, state: FSMContext):
         if not validate_birth(message.text):
             await message.answer(
                 text=f'<b>Регистрация нового исполнителя</b>\n'
-                     f'Дата рождения указана некорректно! Попробуйте еще раз.',
-                parse_mode='HTML'
+                     f'❌ Дата рождения указана некорректно! Попробуйте еще раз.',
+                parse_mode='HTML',
             )
         else:
             await state.update_data(date_of_birth=message.text)
             await state.set_state(RegistrateWorkerStates.area_of_residence)
 
             await message.answer(
-                text=f'<b>Регистрация нового исполнителя</b>\n'
-                     f'Дата рождения принята! Теперь введите, где вы живете. Хватит просто района.',
+                text=f'<b>Дата рождения принята!</b> <i>Нам надо знать откуда вы.</i>\n'
+                     f'Укажите, где вы живете. Хватит просто района.',
                 parse_mode='HTML',
             )
     except Exception as e:
