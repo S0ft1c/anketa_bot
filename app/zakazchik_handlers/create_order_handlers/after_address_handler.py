@@ -3,6 +3,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from .create_order_states import CreateOrderStates
 from loguru import logger
+from .back_to_zakazhick_btn import back_to_zakazhick_btn
 
 after_address_handler_router = Router()
 
@@ -17,9 +18,12 @@ async def after_address_handler(message: Message, state: FSMContext):
 
         # answer
         await message.answer(
-            text='<b>Создание нового заказа</b>\n\n'
-                 'Указанный вами адрес сохранен! Теперь введите описание специфики работы.',
+            text='<b>Указанный вами адрес сохранен!</b> '
+                 '<i>🔨 Теперь введите описание работы</i>\n\n'
+                 'Опять же, вы можете указывать краткое содержание, так как позднее вам будет предложено указать '
+                 'более подробную информацию про работу.',
             parse_mode='HTML',
+            reply_markup=back_to_zakazhick_btn
         )
     except Exception as e:
         logger.error(f'Error in after_address_handler_router -> {e}')

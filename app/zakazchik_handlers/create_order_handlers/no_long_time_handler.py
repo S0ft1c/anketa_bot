@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from apscheduler.triggers.date import DateTrigger
 from loguru import logger
 
@@ -21,9 +21,14 @@ async def yes_long_time(callback: CallbackQuery, state: FSMContext):
         await state.set_state(CreateOrderStates.long_days)
 
         await callback.message.answer(
-            text='<b>Создание заказа завершено!</b>'
-                 'Вы можете увидеть свой заказ в разделе "Мои заказы"',
+            text='<b>Создание заказа завершено!</b>\n'
+                 'Теперь вы будете получать уведомления о новых исполнителях на заказ.\n'
+                 'Также посмотреть на свой заказ, удалить его (если он-таки оказался излишен), завершить заказ вы '
+                 'можете в "Мои заказы" по кнопке снизу.',
             parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='👀 Мои заказы', callback_data='view_my_orders')],
+            ]),
         )
 
         lastrowid = await add_order_to_db(

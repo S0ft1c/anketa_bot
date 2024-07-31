@@ -11,11 +11,11 @@ async def ya_zakazchik_callback_handler(callback: CallbackQuery):
         await callback.answer('')
         await callback.message.answer(
             text='<b>Вы - заказчик.</b>\n'
-                 'Выберите действие, которое вас интересует.',
+                 'Вы можете создать создать заказ, а также просмотреть все свои заказы.\n',
             parse_mode='HTML',
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text='Создать заказ', callback_data='create_order'),
-                 InlineKeyboardButton(text='Посмотреть свои заказы', callback_data='view_my_orders')]
+                [InlineKeyboardButton(text='🆕 Создать заказ', callback_data='create_order'),
+                 InlineKeyboardButton(text='👀 Посмотреть свои заказы', callback_data='view_my_orders')]
             ])
         )
     except Exception as e:

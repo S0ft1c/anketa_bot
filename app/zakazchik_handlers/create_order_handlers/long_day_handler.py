@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from apscheduler.triggers.date import DateTrigger
 from loguru import logger
 
@@ -20,7 +20,7 @@ async def yes_long_time(message: Message, state: FSMContext):
         if not validate_long_days(message.text):
             await message.answer(
                 text='<b>Создание долгосрочного заказа заказа.</b>'
-                     'Введенное ваши число некорректно. Попробуйте еще раз.',
+                     'Введенное ваши число дней некорректно. Попробуйте еще раз.',
                 parse_mode='HTML',
             )
         else:
@@ -29,6 +29,9 @@ async def yes_long_time(message: Message, state: FSMContext):
                 text='<b>Создание долгосрочного заказа завершено!</b>'
                      'Вы можете увидеть его в разделе "Мои заказы"',
                 parse_mode='HTML',
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text='👀 Мои заказы', callback_data='view_my_orders')],
+                ]),
             )
 
             lastrowid = await add_order_to_db(

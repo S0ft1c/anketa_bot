@@ -3,6 +3,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from .create_order_states import CreateOrderStates
 from loguru import logger
+from .back_to_zakazhick_btn import back_to_zakazhick_btn
 
 after_work_desc_router = Router()
 
@@ -17,9 +18,11 @@ async def after_work_desc_handler(message: Message, state: FSMContext):
 
         # answer
         await message.answer(
-            text='<b>Создание нового заказа</b>\n\n'
-                 'Специфика работы сохранена! Теперь введите какую оплату (в руб.) получат исполнители.',
+            text='<b>Описание работы сохранено!</b> '
+                 '<i>💸 Теперь укажите какую оплату получат работники</i>\n\n'
+                 'Оплата указывается исключительно числом в формате руб/час.',
             parse_mode='HTML',
+            reply_markup=back_to_zakazhick_btn
         )
     except Exception as e:
         logger.error(f'Error in after_work_desc_handler -> {e}')
