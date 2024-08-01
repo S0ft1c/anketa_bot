@@ -1,0 +1,6 @@
+aiogram~=3.8.0
+pandas~=2.2.2
+loguru~=0.7.2
+python-dotenv~=1.0.1
+apscheduler~=3.10.4
+aiosqlite~=0.20.0
