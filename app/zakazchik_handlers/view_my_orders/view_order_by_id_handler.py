@@ -16,6 +16,9 @@ async def create_kb(order_id: int | str, is_long: bool):
             InlineKeyboardButton(text='Редактировать количество дней', callback_data=f'edit_long_days_in_id={order_id}')
         )
     builder.add(
+        InlineKeyboardButton(text='Отправить приглашение человеку', callback_data=f'send_to_exact_person={order_id}')
+    )
+    builder.add(
         InlineKeyboardButton(text='Удалить заказ', callback_data=f'delete_order_by_id={order_id}')
     )
     builder.add(

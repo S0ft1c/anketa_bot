@@ -116,6 +116,19 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def select_worker_by_username(self, username: str):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM workers WHERE tg_nickname=?', (username,))
+            worker_from_database = await cursor.fetchone()
+            result = {
+                el: worker_from_database[idx]
+                for idx, el in enumerate(self.workers_mask)
+            }
+            return result
+
+        except Exception as e:
+            logger.error(f'Error in select_worker_by_username: {e}')
+
     async def select_all_admin_logs(self):
         try:
             cursor = await self.conn.execute('SELECT * FROM admin_logs')

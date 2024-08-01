@@ -1,6 +1,7 @@
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from loguru import logger
 
 from sqlite_database import DB
@@ -49,7 +50,23 @@ async def join_to_order_request_handler(callback: CallbackQuery, state: FSMConte
                     worker_id=callback.from_user.id,
                 )
                 await callback.message.answer(
-                    text=f'Вы успешно откликнулись на заказ! Теперь вы можете его найти в меню "Активные заказы".'
+                    text=f'Вы успешно откликнулись на заказ! Теперь вы можете его найти в меню "Активные заказы".',
+                    reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(text='👷‍♂️ Активные заказы',
+                                              callback_data='active_work')]
+                    ])
+                )
+
+                await callback.bot.send_message(
+                    chat_id=order_info['customer_id'],
+                    text=f'На ваш заказ -- {order_info['date']} - {order_info['address']} -- откликнулся исполнитель.\n'
+                         f'<b>Информация о исполнителе:</b>\n'
+                         f'ФИО: {worker['full_name']}\n'
+                         f'Телефон: {worker["contact_number"]}\n'
+                         f'Дата рождения: {worker['date_of_birth']}\n'
+                         f'Область проживания: {worker['area_of_residence']}\n'
+                         f'Рейтинг: {worker['rating']}',
+                    parse_mode=ParseMode.HTML,
                 )
             else:  # all ppl founded
                 await callback.message.answer(
