@@ -42,11 +42,9 @@ async def send_to_exact_person_handler(callback: CallbackQuery, state: FSMContex
 @send_to_exact_person_router.message(SendToExactPerson.entity)
 async def send_to_exact_person_handler_2(message: Message, state: FSMContext):
     try:
-
+        data = await state.get_data()
+        order_id = data['order_id']
         try:
-            data = await state.get_data()
-            order_id = data['order_id']
-
             if message.text.startswith('@'):
 
                 async with DB() as db:
@@ -63,6 +61,9 @@ async def send_to_exact_person_handler_2(message: Message, state: FSMContext):
                     text='Видимо вы указали неправильный никнейм (или id) или этого пользователя нет в базе данных.\n'
                          'Попробуйте еще раз.',
                     parse_mode=ParseMode.HTML,
+                    reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(text='🔙 Назад', callback_data=f'view_order_by_id={order_id}')]
+                    ])
                 )
                 return
 
@@ -93,13 +94,15 @@ async def send_to_exact_person_handler_2(message: Message, state: FSMContext):
                 text='Сообщение успешно отправлено!'
             )
 
-
         except Exception as e:
             logger.warning(f'Cannot send message to exact person: {e}')
             await message.answer(
                 text='Видимо вы указали неправильный никнейм (или id) или этого пользователя нет в базе данных.\n'
                      'Попробуйте еще раз.',
                 parse_mode=ParseMode.HTML,
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text='🔙 Назад', callback_data=f'view_order_by_id={order_id}')]
+                ])
             )
 
     except Exception as e:
