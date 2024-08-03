@@ -17,6 +17,7 @@ class DB:
         self.admin_logs_mask = ['id', 'customer_id', 'worker_id', 'date', 'how_many_ppl', 'address', 'work_desc',
                                 'payment', 'help_phone', 'FULL_address', 'FULL_work_desc', 'FULL_phones',
                                 'FULL_additional_info', 'long_time', 'long_days', 'report', 'hours']
+        self.admins_mask = ['id', 'telegram_id']
 
     async def __aenter__(self):
         self.conn = await aiosqlite.connect(self.db_path)
@@ -115,6 +116,37 @@ class DB:
             )
         ''')
         await self.conn.commit()
+        await self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS admins (
+                id INTEGER PRIMARY KEY,
+                telegram_id STRING
+            )
+        ''')
+        await self.conn.commit()
+
+    async def select_all_admins(self):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM admins')
+            admins_from_database = await cursor.fetchall()
+
+            result = [
+                {
+                    el: admin[idx]
+                    for idx, el in enumerate(self.admins_mask)
+                }
+                for admin in admins_from_database
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_admins -> {e}')
+
+    async def insert_admin(self, telegram_id: int | str):
+        try:
+            cursor = await self.conn.execute('INSERT INTO admins (telegram_id) VALUES (?)', (str(telegram_id),))
+            await self.conn.commit()
+            return cursor.lastrowid
+        except Exception as e:
+            logger.error(f'Error in insert_admin -> {e}')
 
     async def select_worker_by_username(self, username: str):
         try:

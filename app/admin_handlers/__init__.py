@@ -1,6 +1,7 @@
 from aiogram import Router
 
 from app.admin_handlers.admin_hours_commit import admin_hours_commit_router
+from .add_admin import add_admin_router
 from .admin_command_handler import admin_command_router
 from .admin_excel import admin_excel_router
 from .admin_long_projects import admin_long_projects_router
@@ -12,6 +13,7 @@ admin_router.include_routers(
     admin_command_router,
     admin_hours_commit_router,
     admin_long_projects_router,
-    admin_excel_router
+    admin_excel_router,
+    add_admin_router
 
 )
