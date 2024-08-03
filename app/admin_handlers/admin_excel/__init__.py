@@ -6,6 +6,7 @@ from .to_excel_all_orders_by_week_handler import to_excel_all_orders_by_week_rou
 from .to_excel_all_workers_handler import to_excel_all_workers_router
 from .to_excel_by_own_data_handler import to_excel_by_own_data_router
 from .to_excel_by_week_handler import to_excel_by_week_router
+from .to_google_sheets_handler import to_google_sheets_router
 
 admin_excel_router = Router()
 
@@ -16,5 +17,6 @@ admin_excel_router.include_routers(
     to_excel_by_week_router,
     to_excel_all_orders_by_week_router,
     to_excel_all_orders_by_own_data_router,
-    to_excel_all_workers_router
+    to_excel_all_workers_router,
+    to_google_sheets_router
 )

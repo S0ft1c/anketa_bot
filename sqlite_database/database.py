@@ -124,6 +124,36 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def select_all_orders(self):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM orders')
+            orders_from_db = await cursor.fetchall()
+            result = [
+                {
+                    el: ordr[idx]
+                    for idx, el in enumerate(self.orders_mask)
+                }
+                for ordr in orders_from_db
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_inworks')
+
+    async def select_all_inworks(self):
+        try:
+            cursor = await self.conn.execute('SELECT * FROM inwork')
+            inwork_from_db = await cursor.fetchall()
+            result = [
+                {
+                    el: inwork[idx]
+                    for idx, el in enumerate(self.inwork_mask)
+                }
+                for inwork in inwork_from_db
+            ]
+            return result
+        except Exception as e:
+            logger.error(f'Error in select_all_inworks')
+
     async def select_all_admins(self):
         try:
             cursor = await self.conn.execute('SELECT * FROM admins')
