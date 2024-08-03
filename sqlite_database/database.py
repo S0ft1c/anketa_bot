@@ -124,6 +124,14 @@ class DB:
         ''')
         await self.conn.commit()
 
+    async def delete_admin_by_telegram_id(self, telegram_id: int | str):
+        try:
+            cursor = await self.conn.execute('DELETE FROM admins WHERE telegram_id=?', (str(telegram_id),))
+            await self.conn.commit()
+            return True
+        except Exception as e:
+            logger.error(f'Error in delete_admin_by_telegram_id -> {e}')
+
     async def select_all_orders(self):
         try:
             cursor = await self.conn.execute('SELECT * FROM orders')

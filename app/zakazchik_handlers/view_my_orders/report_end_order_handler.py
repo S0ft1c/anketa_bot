@@ -3,7 +3,7 @@ from random import randint
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from apscheduler.triggers.date import DateTrigger
 from loguru import logger
 
@@ -101,7 +101,11 @@ async def report_end_order_handler(message: Message, state: FSMContext):
             await db.delete_order_by_order_id(order_id)
 
         await message.answer(
-            text='Отчет успешно отправлен! Спасибо!'
+            text='Отчет успешно отправлен! Спасибо!',
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Назад',
+                                      callback_data='view_order_by_id')]
+            ])
         )
         await state.clear()
 

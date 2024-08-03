@@ -40,7 +40,8 @@ async def admin_command_handler(message: Message, state: FSMContext):
                 [InlineKeyboardButton(text='Подтверждение часов', callback_data='admin_hours_commit_list')],
                 [InlineKeyboardButton(text='Долгосрочные проекты', callback_data='admin_long_projects_list')],
                 [InlineKeyboardButton(text='Выгрузить отчеты', callback_data='admin_view_options_excel')],
-                [InlineKeyboardButton(text='Добавить администратора', callback_data='add_admin_to_admins')]
+                [InlineKeyboardButton(text='Добавить администратора', callback_data='add_admin_to_admins')],
+                [InlineKeyboardButton(text='Удалить администратора', callback_data='delete_admin_from_admins')]
             ])
         )
     except Exception as e:
@@ -65,7 +66,8 @@ async def admin_command_handler(callback: CallbackQuery, state: FSMContext):
                 [InlineKeyboardButton(text='Подтверждение часов', callback_data='admin_hours_commit_list')],
                 [InlineKeyboardButton(text='Долгосрочные проекты', callback_data='admin_long_projects_list')],
                 [InlineKeyboardButton(text='Выгрузить отчеты', callback_data='admin_view_options_excel')],
-                [InlineKeyboardButton(text='Добавить администратора', callback_data='add_admin_to_admins')]
+                [InlineKeyboardButton(text='Добавить администратора', callback_data='add_admin_to_admins')],
+                [InlineKeyboardButton(text='Удалить администратора', callback_data='delete_admin_from_admins')]
             ])
         )
     except Exception as e:
