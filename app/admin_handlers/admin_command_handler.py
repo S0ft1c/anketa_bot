@@ -14,6 +14,12 @@ async def create_admin_ids():
     load_dotenv()
     admin_ids = set(int(el) for el in os.environ.get('ADMIN_IDS').split(','))
     async with DB() as db:
+        admins_from_database = await db.select_all_admins()
+        admins_from_database = [el['telegram_id'] for el in admins_from_database]
+        for id in admin_ids:
+            if int(id) in admins_from_database or str(id) in admins_from_database:
+                continue
+            await db.insert_admin(id)
         admins_from_db = await db.select_all_admins()
         admins_ids_from_db = [el['telegram_id'] for el in admins_from_db]
         admin_ids = admin_ids | set(admins_ids_from_db)

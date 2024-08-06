@@ -26,10 +26,17 @@ async def delete_admin_from_admins_handler(callback: CallbackQuery, state: FSMCo
         await state.clear()
         await callback.answer()
 
+        async with DB() as db:
+            admins = await db.select_all_admins()
+
         await callback.message.answer(
-            text='Внизу указаны все id пользователей, которые обладают правами администратора.\n'
-                 'Просто нажмите на id пользователя, чтобы лишить его прав администратора',
-            parse_mode=ParseMode.MARKDOWN,
+            text='Внизу указаны все id пользователей, которые обладают правами администратора.\n' +
+                 'Просто нажмите на id пользователя, чтобы лишить его прав администратора.\n' +
+                 'Вот все пользователи (это ссылки, просто перейдите и посмотрите кто это, чтобы потом удалить):\n' +
+                 '\n'.join(
+                     f'<a href="tg://user?id={admin['telegram_id']}">{admin['telegram_id']}</a>' for admin in admins
+                 ),
+            parse_mode=ParseMode.HTML,
             reply_markup=await create_kb()
         )
 
