@@ -4,3 +4,6 @@ loguru~=0.7.2
 python-dotenv~=1.0.1
 apscheduler~=3.10.4
 aiosqlite~=0.20.0
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

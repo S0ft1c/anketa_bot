@@ -2,7 +2,8 @@
 .idea
 .env
 *.sqlite
-test.py
+test_dir/test.py
 *.xlsx
 *.log
 *.zip
+test_dir

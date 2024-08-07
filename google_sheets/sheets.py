@@ -1,5 +1,7 @@
+import asyncio
 import os
 
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -13,6 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 class Sheet:
     def __init__(self):
+        load_dotenv()
         self.SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
         self.credentials = None
 
@@ -103,6 +106,6 @@ class Sheet:
 
 if __name__ == '__main__':
     sheet = Sheet()
-    print(
-        sheet.get_workers()
+    asyncio.run(
+        sheet.write_all_to_google_table()
     )
