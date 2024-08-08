@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from loguru import logger
@@ -42,6 +43,7 @@ async def view_review_id_handler(callback: CallbackQuery, state: FSMContext):
 
         async with DB() as db:
             rev_info = await db.select_review_by_id(review_id)
+            worker = await db.get_worker_by_tg_id(rev_info['worker_id'])
 
         await callback.message.answer(
             text='<b><i>Информация по заказу:</i></b>\n\n'
@@ -59,6 +61,16 @@ async def view_review_id_handler(callback: CallbackQuery, state: FSMContext):
                  f'{f'<u>Это долгосрочный заказ. => Сроки {rev_info['long_days']} дн.</u>' if rev_info['long_time']
                  else f'Это не долгосрочный заказ.'}',
             parse_mode='HTML',
+        )
+        await callback.bot.send_message(
+            chat_id=callback.from_user.id,
+            text=f'<b>Информация о исполнителе:</b>\n'
+                 f'ФИО: {worker['full_name']}\n'
+                 f'Телефон: {worker["contact_number"]}\n'
+                 f'Дата рождения: {worker['date_of_birth']}\n'
+                 f'Область проживания: {worker['area_of_residence']}\n'
+                 f'Рейтинг: {worker['rating']}',
+            parse_mode=ParseMode.HTML,
         )
         await callback.bot.send_message(
             chat_id=callback.from_user.id,

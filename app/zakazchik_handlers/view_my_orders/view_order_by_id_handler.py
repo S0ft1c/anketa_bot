@@ -49,11 +49,11 @@ async def view_order_by_id_handler(callback: CallbackQuery, state: FSMContext):
             ll_txt = f'<u>Это не долгосрочный заказ.</u>'
 
         await callback.message.answer(
-            text=f'📅 <b>Дата заказа: {order_info['date']}</b>\n--------------\n'
-                 f'👥 <i>Людей надо</i>:\n{order_info['how_many_ppl']}\n--------------\n'
-                 f'🏠 <i>Адрес</i>:\n{order_info['address']}\n--------------\n'
+            text=f'📅 <b>Дата заказа: {order_info['date'].replace('.20', '.')}</b>\n--------------\n'
+                 f'👥 <i>Людей надо</i>: {order_info['how_many_ppl']}\n--------------\n'
+                 f'🏠 <i>Адрес</i>: {order_info['address']}\n--------------\n'
                  f'🔧 <i>Описание работы</i>\n{order_info['work_desc']}\n--------------\n'
-                 f'💵 <i>Оплата (руб/час)</i>\n{order_info['payment']}\n--------------\n'
+                 f'💵 <i>Оплата (руб/час)</i> {order_info['payment']}\n--------------\n'
                  f'📞 <i>Телефон для справок</i>\n{order_info['help_phone']}\n--------------\n\n'
                  f'ℹ️ <b>Подробная информация</b>\n'
                  f'🏠 <i>Адрес</i>:\n{order_info['FULL_address']}\n--------------\n'

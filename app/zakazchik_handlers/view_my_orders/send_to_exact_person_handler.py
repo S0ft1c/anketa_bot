@@ -78,11 +78,11 @@ async def send_to_exact_person_handler_2(message: Message, state: FSMContext):
             await message.bot.send_message(
                 chat_id=worker['telegram_id'],
                 text=f'<b>Вам доступен новый заказ!</b>\n'
-                     f'📅 <b>Дата заказа: {order['date']}</b>\n--------------\n'
-                     f'👥 <i>Людей надо</i>:\n{order['how_many_ppl']}\n--------------\n'
+                     f'📅 <b>Дата заказа: {order['date'].replace('.20', '.')}</b>\n--------------\n'
+                     f'👥 <i>Людей надо</i>: {order['how_many_ppl']}\n--------------\n'
                      f'🏠 <i>Адрес</i>:\n{order['address']}\n--------------\n'
                      f'🔧 <i>Описание работы</i>\n{order['work_desc']}\n--------------\n'
-                     f'💵 <i>Оплата (руб/час)</i>\n{order['payment']}\n--------------\n'
+                     f'💵 <i>Оплата (руб/час)</i> {order['payment']}\n--------------\n'
                      f'📞 <i>Телефон для справок</i>\n{order['help_phone']}\n--------------\n\n' + ll_txt,
                 parse_mode='HTML',
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
