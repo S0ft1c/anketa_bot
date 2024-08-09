@@ -104,7 +104,7 @@ async def report_end_order_handler(message: Message, state: FSMContext):
             text='Отчет успешно отправлен! Спасибо!',
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text='Назад',
-                                      callback_data='view_order_by_id')]
+                                      callback_data='ya_zakazchik')]
             ])
         )
         await state.clear()

@@ -134,7 +134,7 @@ class DB:
 
     async def select_all_orders(self):
         try:
-            cursor = await self.conn.execute('SELECT * FROM orders')
+            cursor = await self.conn.execute('SELECT * FROM orders WHERE customer_id != "0"')
             orders_from_db = await cursor.fetchall()
             result = [
                 {
@@ -216,7 +216,8 @@ class DB:
 
     async def select_long_projects_from_orders(self):
         try:
-            cursor = await self.conn.execute('SELECT * FROM orders WHERE long_time = True AND long_days = 0')
+            cursor = await self.conn.execute(
+                'SELECT * FROM orders WHERE long_time = True AND long_days = 0 AND order_id != "0"')
             orders_from_database = await cursor.fetchall()
             result = [
                 {
@@ -382,7 +383,7 @@ class DB:
 
     async def delete_order_by_order_id(self, order_id: str | int):
         try:
-            cursor = await self.conn.execute('DELETE FROM orders WHERE id=?', (order_id,))
+            cursor = await self.conn.execute('UPDATE orders SET customer_id = ? WHERE id = ?', ('0', order_id,))
             await self.conn.commit()
             return True
         except Exception as e:
@@ -562,7 +563,8 @@ class DB:
 
     async def select_orders_where_customer(self, customer_id: int | str) -> list[dict]:
         try:
-            cursor = await self.conn.execute('SELECT * from orders WHERE customer_id = ?', (str(customer_id),))
+            cursor = await self.conn.execute('SELECT * from orders WHERE customer_id = ? AND customer_id != "0"',
+                                             (str(customer_id),))
             orders_from_database = await cursor.fetchall()
             orders = [{
                 el: element_order[idx]
@@ -575,7 +577,7 @@ class DB:
 
     async def select_order_by_id(self, order_id: int | str) -> dict:
         try:
-            cursor = await self.conn.execute('SELECT * from orders WHERE id=?', (int(order_id),))
+            cursor = await self.conn.execute('SELECT * from orders WHERE id=? AND customer_id != "0"', (int(order_id),))
             order_from_database = await cursor.fetchone()
             orders = {
                 el: order_from_database[idx]
@@ -587,7 +589,8 @@ class DB:
 
     async def update_long_days_in_order_by_id(self, order_id: int | str, days: int):
         try:
-            cursor = await self.conn.execute('UPDATE orders SET long_days = ? WHERE id=?', (days, order_id,))
+            cursor = await self.conn.execute('UPDATE orders SET long_days = ? WHERE id=? AND customer_id != "0"',
+                                             (days, order_id,))
             await self.conn.commit()
         except Exception as e:
             logger.error(f'Error in update_long_days_in_order_by_id -> {e}')
