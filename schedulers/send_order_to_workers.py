@@ -15,7 +15,7 @@ bot_url = os.environ.get("BOT_URL")
 async def send_message_to_worker(bot: Bot, order, worker):
     try:
         if order['long_time'] and order['long_days'] > 0:
-            ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_time']}</u>\n'
+            ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_days']}</u>\n'
                       f'Учитывайте дату, когда создавался заказ, чтобы понять до какого он числа.')
         elif order['long_time'] and order['long_days'] == 0:
             ll_txt = f'<u>Это долгосрочный заказ. Его длительность не была определена заказчиком.</u>'
@@ -46,7 +46,7 @@ async def send_message_to_group(bot: Bot, order):
         load_dotenv()
 
         if order['long_time'] and order['long_days'] > 0:
-            ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_time']}</u>\n'
+            ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_days']}</u>\n'
                       f'Учитывайте дату, когда создавался заказ, чтобы понять до какого он числа.')
         elif order['long_time'] and order['long_days'] == 0:
             ll_txt = f'<u>Это долгосрочный заказ. Его длительность не была определена заказчиком.</u>'

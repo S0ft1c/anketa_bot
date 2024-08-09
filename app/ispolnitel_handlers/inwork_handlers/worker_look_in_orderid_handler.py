@@ -37,7 +37,7 @@ async def worker_look_in_orderid_handler(callback: CallbackQuery, state: FSMCont
             order_info = await db.select_order_by_id(order_id)
 
             if order_info['long_time'] and order_info['long_days'] > 0:
-                ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order_info['long_time']}</u>\n'
+                ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order_info['long_days']}</u>\n'
                           f'Учитывайте дату, когда создавался заказ, чтобы понять до какого он числа.')
             elif order_info['long_time'] and order_info['long_days'] == 0:
                 ll_txt = f'<u>Это долгосрочный заказ. Его длительность не была определена заказчиком.</u>'

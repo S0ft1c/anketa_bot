@@ -68,7 +68,7 @@ async def send_to_exact_person_handler_2(message: Message, state: FSMContext):
                 return
 
             if order['long_time'] and order['long_days'] > 0:
-                ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_time']}</u>\n'
+                ll_txt = (f'<u>Это долгосрочный заказ. Его длительность = {order['long_days']}</u>\n'
                           f'Учитывайте дату, когда создавался заказ, чтобы понять до какого он числа.')
             elif order['long_time'] and order['long_days'] == 0:
                 ll_txt = f'<u>Это долгосрочный заказ. Его длительность не была определена заказчиком.</u>'
